@@ -15,7 +15,9 @@
     "paths": {
       "@src/*": ["src/*"],
       "@queries/*": ["queries/*"],
-      "@tests/*": ["tests/*"]
+      "@tests/*": ["tests/*"],
+      "@utils/*": ["utils/*"],
+      "@models/*": ["models/*"]
     }
   },
   "include": ["./**/*.ts"],

@@ -26,12 +26,13 @@ custom:
 
 
 plugins:
-  - serverless-offline
+  - serverless-dotenv-plugin
   - serverless-webpack
   - serverless-domain-manager
   # - serverless-iam-roles-per-function
   # - serverless-create-global-dynamodb-table
   - serverless-prune-plugin
+  - serverless-offline
 
 provider:
   name: aws
@@ -61,3 +62,11 @@ functions:
       - http:
           method: get
           path: hello
+          cors: true
+  sendMessage:
+    handler: src/contact.sendMessage
+    events:
+      - http:
+          method: post
+          path: sendMessage
+          cors: true

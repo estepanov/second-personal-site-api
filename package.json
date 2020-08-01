@@ -4,7 +4,8 @@
   "description": "Serverless webpack example using Typescript",
   "main": "handler.js",
   "scripts": {
-    "deploy": "sls deploy --stage dev --aws-profile serverless-deploy",
+    "deploy:dev": "sls deploy --stage dev --aws-profile serverless-deploy",
+    "deploy:prod": "sls deploy --stage production --aws-profile serverless-deploy",
     "lint": "eslint . --ext js,ts --cache --fix",
     "prettier": "prettier --list-different './**/*.{js,ts}'",
     "typecheck": "tsc --noEmit",
@@ -21,8 +22,12 @@
     "@dazn/lambda-powertools-pattern-basic": "^1.25.0",
     "@dazn/lambda-powertools-sns-client": "^1.24.1",
     "@dazn/lambda-powertools-sqs-client": "^1.24.1",
+    "@hapi/address": "^4.1.0",
+    "@sendgrid/mail": "^7.2.2",
     "aws-lambda": "^1.0.6",
     "aws-sdk": "^2.725.0",
+    "disposable-email-domains": "^1.0.56",
+    "hcaptcha": "^0.0.2",
     "source-map-support": "^0.5.10"
   },
   "devDependencies": {
@@ -48,6 +53,7 @@
     "prettier": "^2.0.5",
     "serverless-create-global-dynamodb-table": "^3.0.0",
     "serverless-domain-manager": "^4.2.0",
+    "serverless-dotenv-plugin": "^3.0.0",
     "serverless-iam-roles-per-function": "^2.0.2",
     "serverless-offline": "^6.5.0",
     "serverless-prune-plugin": "^1.4.3",

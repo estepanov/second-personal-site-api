@@ -34,7 +34,9 @@
         "map": [
           ["@src", "./src"],
           ["@tests", "./tests"],
-          ["@queries", "./queries"]
+          ["@queries", "./queries"],
+          ["@utils", "./utils"],
+          ["@models", "./models"]
         ],
         "extensions": [
           ".ts",

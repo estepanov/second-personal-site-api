@@ -17,6 +17,8 @@ module.exports = {
       '@src': path.resolve(__dirname, './src'),
       '@queries': path.resolve(__dirname, './queries'),
       '@tests': path.resolve(__dirname, './tests'),
+      '@models': path.resolve(__dirname, './models'),
+      '@utils': path.resolve(__dirname, './utils'),
     }
   },
   output: {
