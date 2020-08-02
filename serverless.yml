@@ -62,11 +62,21 @@ functions:
       - http:
           method: get
           path: hello
-          cors: true
+          cors:
+            origin: ${env:HTTP_CORS_ORIGIN}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true
   sendMessage:
     handler: src/contact.sendMessage
     events:
       - http:
           method: post
           path: sendMessage
-          cors: true
+          cors:
+            origin: ${env:HTTP_CORS_ORIGIN}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true

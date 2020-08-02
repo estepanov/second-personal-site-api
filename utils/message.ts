@@ -29,6 +29,10 @@ class Result {
   bodyToString () {
     return {
       statusCode: this.statusCode,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.HTTP_CORS_ORIGIN,
+        'Access-Control-Allow-Credentials': true,
+      },
       body: JSON.stringify({
         code: this.code,
         message: this.message,
