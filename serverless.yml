@@ -5,7 +5,7 @@ custom:
   customDomain:
     certificateName: '*.api.estep.nyc'
     domainName: hello.api.estep.nyc
-    basePath: ''
+    basePath: ${self:provider.stage}
     stage: ${self:provider.stage}
     createRoute53Record: false
     apiType: rest
