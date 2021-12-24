@@ -1,5 +1,5 @@
-service:
-  name: personal-site-api
+service: personal-site-api
+useDotenv: true
 
 custom:
   customDomain:
@@ -26,7 +26,6 @@ custom:
 
 
 plugins:
-  - serverless-dotenv-plugin
   - serverless-webpack
   - serverless-domain-manager
   # - serverless-iam-roles-per-function
@@ -37,37 +36,45 @@ plugins:
 provider:
   name: aws
   runtime: nodejs12.x
-  frameworkVersion: ‘1.64.1’
   stage: ${opt:stage, 'local'}
   region: ${opt:region, 'us-east-1'}
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+    shouldStartNameWithService: true # in anticipation of serverless v3
   environment:
     DEBUG: '*'
     NODE_ENV: ${self:provider.stage}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    GAMER_TAG: ${ssm:${opt:stage, 'dev'}.GAMER_TAG}
+    STDLIB_SECRET_TOKEN: ${ssm:${opt:stage, 'dev'}.STDLIB_SECRET_TOKEN}
+    SENDGRID_API_KEY: ${ssm:${opt:stage, 'dev'}.SENDGRID_API_KEY}
+    CONTACT_EMAIL: ${ssm:${opt:stage, 'dev'}.CONTACT_EMAIL}
+    HCAPTCHA_SECRET: ${ssm:${opt:stage, 'dev'}.HCAPTCHA_SECRET}
+    HTTP_CORS_ORIGIN: ${ssm:${opt:stage, 'dev'}.HTTP_CORS_ORIGIN}
   tracing:
     lambda: true
+  lambdaHashingVersion: 20201221 # in anticipation of serverless v3
   iamRoleStatements:
     - Effect: Allow
       Action:
+        - ses:SendEmail
         - xray:PutTraceSegments
         - xray:PutTelemetryRecords
       Resource: "*"
 
 functions:
-  hello:
-    handler: src/handler.hello
-    events:
-      - http:
-          method: get
-          path: hello
-          cors:
-            origin: ${env:HTTP_CORS_ORIGIN}
-            headers:
-              - Content-Type
-              - Authorization
-            allowCredentials: true
+  # hello:
+  #   handler: src/handler.hello
+  #   events:
+  #     - http:
+  #         method: get
+  #         path: hello
+  #         cors:
+  #           origin: ${ssm:${opt:stage, 'dev'}.HTTP_CORS_ORIGIN}
+  #           headers:
+  #             - Content-Type
+  #             - Authorization
+  #           allowCredentials: true
   sendMessage:
     handler: src/contact.sendMessage
     events:
@@ -75,7 +82,31 @@ functions:
           method: post
           path: sendMessage
           cors:
-            origin: ${env:HTTP_CORS_ORIGIN}
+            origin: ${ssm:${opt:stage, 'dev'}.HTTP_CORS_ORIGIN}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true
+  haloStatsOverview:
+    handler: src/halo.statsOverview
+    events:
+      - http:
+          method: get
+          path: halo/stats/overview
+          cors:
+            origin: ${ssm:${opt:stage, 'dev'}.HTTP_CORS_ORIGIN}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true
+  haloStatsPvpOverview:
+    handler: src/halo.pvpOverview
+    events:
+      - http:
+          method: get
+          path: halo/stats/pvp
+          cors:
+            origin: ${ssm:${opt:stage, 'dev'}.HTTP_CORS_ORIGIN}
             headers:
               - Content-Type
               - Authorization

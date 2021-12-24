@@ -1,3 +1,5 @@
+.eslintcache
+
 # package directories
 node_modules
 jspm_packages
@@ -11,4 +13,6 @@ jspm_packages
 # env variables 
 .env
 .env.production.local
+.env.production
 .env.dev.local
+.env.dev

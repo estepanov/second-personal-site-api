@@ -1,20 +1,15 @@
-import { APIGatewayProxyHandler, APIGatewayEvent, 
-  // Context, Callback
- } from 'aws-lambda';
+import { APIGatewayProxyHandler, APIGatewayEvent } from 'aws-lambda';
 import 'source-map-support/register';
 import { verify } from 'hcaptcha';
 import * as disposableEmails from "disposable-email-domains"
 import { email } from '@hapi/address'
-import sendgrid from '@sendgrid/mail';
 import { sendMessageDTO } from '@models/dto/sendMessageDTO';
-import { MessageUtil, StatusCode } from "@utils/message"
-
-sendgrid.setApiKey(process.env.SENDGRID_API_KEY)
+import { MessageUtil } from "@utils/message"
+import { StatusCode } from '@utils/result';
+import { Mailer } from '@utils/mailer';
 
 const buildMessage = (messageDTO: sendMessageDTO) => {
 return {
-    to: process.env.CONTACT_EMAIL,
-    from: process.env.CONTACT_EMAIL,
     subject: 'New Website Message',
     text: `new message from: \n${messageDTO.name} \n${messageDTO.email} \n message:\n ${messageDTO.message}`,
     html: `
@@ -34,12 +29,11 @@ return {
 }
 
 export const sendMessage: APIGatewayProxyHandler = async (
-  event: APIGatewayEvent,
-  // context: Context,
-  // callback: Callback,
+  event: APIGatewayEvent
 ): Promise<any> => {
   try {
     const message: sendMessageDTO = JSON.parse(event.body);
+    console.log('[incoming]', message)
     if(!message.name || message.name.length < 3) {
       return MessageUtil.error(StatusCode.notAcceptable, "Missing or invalid name.")
     }
@@ -66,7 +60,18 @@ export const sendMessage: APIGatewayProxyHandler = async (
     }
     const payload = buildMessage(message);
     if (process.env.NODE_ENV === "production") {
-      await sendgrid.send(payload)
+      const mailer = new Mailer({
+        source: process.env.CONTACT_EMAIL,
+        destination: process.env.CONTACT_EMAIL,
+        replyTo: message.email,
+        subject: payload.subject,
+        message: {
+          text: payload.text,
+          html: payload.html
+
+        }
+      })
+      await mailer.send()
     } else {
       console.log("[DEV MODE] Skip sending this email:", payload)
     }

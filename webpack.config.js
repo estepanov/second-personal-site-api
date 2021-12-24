@@ -26,6 +26,9 @@ module.exports = {
     path: path.join(__dirname, '.webpack'),
     filename: '[name].js',
   },
+  optimization: {
+    nodeEnv: false
+  },
   target: 'node',
   externals: [nodeExternals()],
   module: {
