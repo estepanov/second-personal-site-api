@@ -11,6 +11,7 @@
     "inlineSources": true,
     "esModuleInterop": true,
     "sourceRoot": "/",
+    "skipLibCheck": true, // temp
     "baseUrl": "./",
     "paths": {
       "@src/*": ["src/*"],
@@ -18,7 +19,7 @@
       "@tests/*": ["tests/*"],
       "@utils/*": ["utils/*"],
       "@models/*": ["models/*"]
-    }
+    },
   },
   "include": ["./**/*.ts"],
   "exclude": [

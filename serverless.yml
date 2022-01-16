@@ -51,6 +51,8 @@ provider:
     CONTACT_EMAIL: ${ssm:${opt:stage, 'dev'}.CONTACT_EMAIL}
     HCAPTCHA_SECRET: ${ssm:${opt:stage, 'dev'}.HCAPTCHA_SECRET}
     HTTP_CORS_ORIGIN: ${ssm:${opt:stage, 'dev'}.HTTP_CORS_ORIGIN}
+    UPSTASH_REDIS_REST_URL: ${ssm:${opt:stage, 'dev'}.UPSTASH_REDIS_REST_URL}
+    UPSTASH_REDIS_REST_TOKEN: ${ssm:${opt:stage, 'dev'}.UPSTASH_REDIS_REST_TOKEN}
   tracing:
     lambda: true
   lambdaHashingVersion: 20201221 # in anticipation of serverless v3
@@ -105,6 +107,18 @@ functions:
       - http:
           method: get
           path: halo/stats/pvp
+          cors:
+            origin: ${ssm:${opt:stage, 'dev'}.HTTP_CORS_ORIGIN}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true
+  haloStatsComparePvpOverview:
+    handler: src/halo.comparePvpOverview
+    events:
+      - http:
+          method: get
+          path: halo/stats/pvp/compare
           cors:
             origin: ${ssm:${opt:stage, 'dev'}.HTTP_CORS_ORIGIN}
             headers:
