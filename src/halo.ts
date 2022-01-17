@@ -3,7 +3,7 @@ import 'source-map-support/register';
 import { Experience, HaloStats, MatchMode } from '@utils/HaloStats';
 import { MessageUtil } from '@utils/message';
 import Cache from '@utils/Cache';
-import { CacheSections, PERSONAL_HALO_STATS_CACHE_SECONDS } from '@utils/constants';
+import { CacheSections, HALO_STATS_CACHE_SECONDS, PERSONAL_OVERALL_HALO_STATS_CACHE_SECONDS } from '@utils/constants';
 import { StatusCode } from '@utils/result';
 import { HaloStatsTracker } from '@utils/HaloStatsTracker';
 
@@ -17,7 +17,7 @@ export const statsOverview: APIGatewayProxyHandler = async (): Promise<any> => {
     const service = new HaloStats(process.env.GAMER_TAG);
     const stats = await service.fetchMultiplayerOverview(Experience.ALL);
     if(stats) {
-      await cache.setSeconds(stats, PERSONAL_HALO_STATS_CACHE_SECONDS)
+      await cache.setSeconds(stats, PERSONAL_OVERALL_HALO_STATS_CACHE_SECONDS)
     }
   
     return MessageUtil.success(stats)
@@ -34,9 +34,9 @@ export const recentMatches: APIGatewayProxyHandler = async (): Promise<any> => {
     if (cachedResults) return MessageUtil.success(cachedResults);
   
     const service = new HaloStats(process.env.GAMER_TAG);
-    const stats = await service.fetchGames(MatchMode.MATCHMADE, 10, 0);
+    const stats = await service.fetchGames(MatchMode.MATCHMADE, 15, 0);
     if(stats) {
-      await cache.setSeconds(stats, PERSONAL_HALO_STATS_CACHE_SECONDS)
+      await cache.setSeconds(stats, HALO_STATS_CACHE_SECONDS)
     }
   
     return MessageUtil.success(stats)
@@ -55,7 +55,7 @@ export const pvpOverview: APIGatewayProxyHandler = async (): Promise<any> => {
     const service = new HaloStats(process.env.GAMER_TAG);
     const stats = await service.fetchMultiplayerOverview(Experience.PVP);
   
-    await cache.setSeconds(stats, PERSONAL_HALO_STATS_CACHE_SECONDS)
+    await cache.setSeconds(stats, HALO_STATS_CACHE_SECONDS)
   
     return MessageUtil.success(stats)
   } catch(err) {
@@ -87,7 +87,7 @@ export const comparePvpOverview: APIGatewayProxyHandler = async (event:APIGatewa
       const meService = new HaloStats(process.env.GAMER_TAG);
       meStats = await meService.fetchMultiplayerOverview(Experience.PVP);
       if(meStats) {
-        await meCache.setSeconds(meStats, PERSONAL_HALO_STATS_CACHE_SECONDS)
+        await meCache.setSeconds(meStats, HALO_STATS_CACHE_SECONDS)
       }
     }
 
@@ -109,7 +109,7 @@ export const comparePvpOverview: APIGatewayProxyHandler = async (event:APIGatewa
         if(tagStats) {
           // sucessfull look up
           await tracker.addLookup(tag)
-          await tagCache.setSeconds(tagStats, PERSONAL_HALO_STATS_CACHE_SECONDS)
+          await tagCache.setSeconds(tagStats, HALO_STATS_CACHE_SECONDS)
         }
       }
 
