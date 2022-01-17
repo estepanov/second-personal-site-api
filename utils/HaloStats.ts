@@ -16,7 +16,7 @@ export enum MatchMode {
 }
 
 export enum StatsApiErrors {
-  InvalidGamerTag = "Could not match player's identifier (halo/infinite@0.2.3/stats/service-record)"
+  PlayerNotFound = "Player not found (halo/infinite@0.3.6/stats/service-record/multiplayer)"
 }
 
 export class HaloStats {
@@ -41,7 +41,7 @@ export class HaloStats {
     } catch(err) {
       console.error('error fetching HaloStats for', this.gamerTag, 'in', type)
       console.error(err)
-      if (err.message === StatsApiErrors.InvalidGamerTag) throw new Error(`Invalid tag: ${this.gamerTag}`)
+      if (err.message === StatsApiErrors.PlayerNotFound) throw new Error(`No player found with tag: ${this.gamerTag}`)
       throw new Error('Sorry something went wrong!')
     }
   }
@@ -57,14 +57,14 @@ export class HaloStats {
         mode
       });
       return {
-        ...response.data,
+        games: response.data,
         fetchedOn: new Date(),
         mode
       };
     } catch(err) {
       console.error('error fetching games for', this.gamerTag, 'in', mode, 'count',count,'offset',offset)
       console.error(err)
-      if (err.message === StatsApiErrors.InvalidGamerTag) throw new Error(`Invalid tag: ${this.gamerTag}`)
+      if (err.message === StatsApiErrors.PlayerNotFound) throw new Error(`No player found with tag: ${this.gamerTag}`)
       throw new Error('Sorry something went wrong!')
     }
   }
