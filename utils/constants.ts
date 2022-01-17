@@ -1,5 +1,6 @@
 export enum CacheSections {
     HaloStats = "HaloStats",
+    HaloRecentMatches = "HaloRecentMatches",
     HaloStatsTracker = "HaloStatsTracker"
 }
 

@@ -1,6 +1,6 @@
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
 import 'source-map-support/register';
-import { Experience, HaloStats } from '@utils/HaloStats';
+import { Experience, HaloStats, MatchMode } from '@utils/HaloStats';
 import { MessageUtil } from '@utils/message';
 import Cache from '@utils/Cache';
 import { CacheSections, PERSONAL_HALO_STATS_CACHE_SECONDS } from '@utils/constants';
@@ -15,7 +15,26 @@ export const statsOverview: APIGatewayProxyHandler = async (): Promise<any> => {
     if (cachedResults) return MessageUtil.success(cachedResults);
   
     const service = new HaloStats(process.env.GAMER_TAG);
-    const stats = await service.fetchOverview(Experience.ALL);
+    const stats = await service.fetchMultiplayerOverview(Experience.ALL);
+    if(stats) {
+      await cache.setSeconds(stats, PERSONAL_HALO_STATS_CACHE_SECONDS)
+    }
+  
+    return MessageUtil.success(stats)
+  } catch(err) {
+    return MessageUtil.error(StatusCode.internalServerError, err.message)
+  }
+};
+
+export const recentMatches: APIGatewayProxyHandler = async (): Promise<any> => {
+  try {
+    const key = [process.env.GAMER_TAG, MatchMode.MATCHMADE, CacheSections.HaloRecentMatches]
+    const cache = new Cache(key)
+    const cachedResults = await cache.get();
+    if (cachedResults) return MessageUtil.success(cachedResults);
+  
+    const service = new HaloStats(process.env.GAMER_TAG);
+    const stats = await service.fetchGames(MatchMode.MATCHMADE, 10, 0);
     if(stats) {
       await cache.setSeconds(stats, PERSONAL_HALO_STATS_CACHE_SECONDS)
     }
@@ -34,7 +53,7 @@ export const pvpOverview: APIGatewayProxyHandler = async (): Promise<any> => {
     if (cachedResults) return MessageUtil.success(cachedResults);
   
     const service = new HaloStats(process.env.GAMER_TAG);
-    const stats = await service.fetchOverview(Experience.PVP);
+    const stats = await service.fetchMultiplayerOverview(Experience.PVP);
   
     await cache.setSeconds(stats, PERSONAL_HALO_STATS_CACHE_SECONDS)
   
@@ -46,22 +65,34 @@ export const pvpOverview: APIGatewayProxyHandler = async (): Promise<any> => {
 
 export const comparePvpOverview: APIGatewayProxyHandler = async (event:APIGatewayEvent): Promise<any> => {
   try {
+    const tag =  event.queryStringParameters?.tag?.trim().toLocaleLowerCase()
+    if(!tag || !tag.length) {
+      return MessageUtil.error(StatusCode.notAcceptable, `A gamer tag is required.`)
+    }
+    if(tag.length < 3) {
+      return MessageUtil.error(StatusCode.notAcceptable, `Gamer tag (${tag}) is too short.`)
+    }
+    if(tag.length > 20) {
+      return MessageUtil.error(StatusCode.notAcceptable, `Gamer tag (${tag}) is too long.`)
+    }
+    if(tag === process.env.GAMER_TAG) {
+      return MessageUtil.error(StatusCode.notAcceptable, `Sneaky, sneaky... I am the best`)
+    }
+
     const meKey = [process.env.GAMER_TAG, Experience.PVP, CacheSections.HaloStats]
     const meCache = new Cache(meKey)
     let meCachedResults = await meCache.get();
     let meStats = {}
     if(!meCachedResults) {
       const meService = new HaloStats(process.env.GAMER_TAG);
-      meStats = await meService.fetchOverview(Experience.PVP);
+      meStats = await meService.fetchMultiplayerOverview(Experience.PVP);
       if(meStats) {
         await meCache.setSeconds(meStats, PERSONAL_HALO_STATS_CACHE_SECONDS)
       }
     }
-  
-    const tag =  event.queryStringParameters?.tag?.trim()
+
     let tagCachedResults
     let tagStats = {}
-    if(tag) {
       const tracker = new HaloStatsTracker()
       const tagKey = [tag, Experience.PVP,  CacheSections.HaloStats]
       const tagCache = new Cache(tagKey)
@@ -74,14 +105,14 @@ export const comparePvpOverview: APIGatewayProxyHandler = async (event:APIGatewa
         
       if(!tagCachedResults) {
         const tagService = new HaloStats(tag);
-        tagStats = await tagService.fetchOverview(Experience.PVP);
+        tagStats = await tagService.fetchMultiplayerOverview(Experience.PVP);
         if(tagStats) {
           // sucessfull look up
           await tracker.addLookup(tag)
           await tagCache.setSeconds(tagStats, PERSONAL_HALO_STATS_CACHE_SECONDS)
         }
       }
-    }
+
   
     return MessageUtil.success({
       me: meCachedResults || meStats,

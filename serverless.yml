@@ -113,6 +113,18 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: true
+  haloStatsRecentMatches:
+    handler: src/halo.recentMatches
+    events:
+      - http:
+          method: get
+          path: halo/stats/recent-matches
+          cors:
+            origin: ${ssm:${opt:stage, 'dev'}.HTTP_CORS_ORIGIN}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true
   haloStatsPvpOverview:
     handler: src/halo.pvpOverview
     events:
