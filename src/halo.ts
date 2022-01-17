@@ -5,6 +5,7 @@ import { MessageUtil } from '@utils/message';
 import Cache from '@utils/Cache';
 import { CacheSections, PERSONAL_HALO_STATS_CACHE_SECONDS } from '@utils/constants';
 import { StatusCode } from '@utils/result';
+import { HaloStatsTracker } from '@utils/HaloStatsTracker';
 
 export const statsOverview: APIGatewayProxyHandler = async (): Promise<any> => {
   try {
@@ -61,13 +62,22 @@ export const comparePvpOverview: APIGatewayProxyHandler = async (event:APIGatewa
     let tagCachedResults
     let tagStats = {}
     if(tag) {
+      const tracker = new HaloStatsTracker()
       const tagKey = [tag, Experience.PVP,  CacheSections.HaloStats]
       const tagCache = new Cache(tagKey)
       tagCachedResults = await tagCache.get();
+
+      if (tagCachedResults) {
+        // sucessfull look up
+        await tracker.addLookup(tag)
+      }
+        
       if(!tagCachedResults) {
         const tagService = new HaloStats(tag);
         tagStats = await tagService.fetchOverview(Experience.PVP);
         if(tagStats) {
+          // sucessfull look up
+          await tracker.addLookup(tag)
           await tagCache.setSeconds(tagStats, PERSONAL_HALO_STATS_CACHE_SECONDS)
         }
       }

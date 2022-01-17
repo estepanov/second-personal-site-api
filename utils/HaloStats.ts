@@ -30,7 +30,8 @@ export class HaloStats {
       });
       return {
         ...response.data,
-        fetchedOn: new Date()
+        fetchedOn: new Date(),
+        type
       };
     } catch(err) {
       console.error('error fetching HaloStats for', this.gamerTag, 'in', type)

@@ -89,6 +89,18 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: true
+  haloStatsTrackerOverview:
+    handler: src/haloTracker.overview
+    events:
+      - http:
+          method: get
+          path: halo/stats-tracker/overview
+          cors:
+            origin: ${ssm:${opt:stage, 'dev'}.HTTP_CORS_ORIGIN}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true
   haloStatsOverview:
     handler: src/halo.statsOverview
     events:
