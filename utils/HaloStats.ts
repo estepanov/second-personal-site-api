@@ -1,71 +1,78 @@
-const lib = require('lib')({token: process.env.STDLIB_SECRET_TOKEN});
+import * as rawLib from "lib";
+
+const lib = rawLib({ token: process.env.STDLIB_SECRET_TOKEN });
 
 export enum Experience {
-  PVP = 'pvp-only',
-  BOTS = 'pve-bots',
-  CUSTOM = 'custom',
-  FEATURED = 'featured',
-  ARENA = 'arena',
-  BTB = 'btb',
-  ALL = 'all'
+  PVP = "pvp-only",
+  BOTS = "pve-bots",
+  CUSTOM = "custom",
+  FEATURED = "featured",
+  ARENA = "arena",
+  BTB = "btb",
+  ALL = "all",
 }
 
 export enum MatchMode {
-  CUSTOM = 'custom',
-  MATCHMADE = 'matchmade'
+  CUSTOM = "custom",
+  MATCHMADE = "matchmade",
 }
 
 export enum StatsApiErrors {
-  PlayerNotFound = "Player not found (halo/infinite@0.3.6/stats/service-record/multiplayer)"
+  PlayerNotFound = "Player not found (halo/infinite@0.3.6/stats/service-record/multiplayer)",
 }
 
 export class HaloStats {
-  api = lib.halo.infinite['@0.3.6'];
-  gamerTag: string | null = null
+  api = lib.halo.infinite["@0.3.6"];
+
+  gamerTag: string | null = null;
 
   constructor(gamertag: string) {
-    this.gamerTag = gamertag
+    this.gamerTag = gamertag;
   }
 
-  async fetchMultiplayerOverview(type = Experience.ALL) {
-    try  {
-      const response = await this.api.stats['service-record'].multiplayer({
+  async fetchMultiplayerOverview(type = Experience.ALL): Promise<unknown> {
+    try {
+      const response = await this.api.stats["service-record"].multiplayer({
         gamertag: this.gamerTag,
-        experience: type
+        experience: type,
       });
       return {
         ...response.data,
         fetchedOn: new Date(),
-        type
+        type,
       };
-    } catch(err) {
-      console.error('error fetching HaloStats for', this.gamerTag, 'in', type)
-      console.error(err)
-      if (err.message === StatsApiErrors.PlayerNotFound) throw new Error(`No player found with tag: ${this.gamerTag}`)
-      throw new Error('Sorry something went wrong!')
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("error fetching HaloStats for", this.gamerTag, "in", type);
+      // eslint-disable-next-line no-console
+      console.error(err);
+      if (err.message === StatsApiErrors.PlayerNotFound) throw new Error(`No player found with tag: ${this.gamerTag}`);
+      throw new Error("Sorry something went wrong!");
     }
   }
 
-  async fetchGames(mode: MatchMode, count: number, offset: number) {
-    try  {
+  async fetchGames(mode: MatchMode, count: number, offset: number): Promise<unknown> {
+    try {
       const response = await this.api.stats.matches.list({
         gamertag: this.gamerTag,
         limit: {
           count,
-          offset
+          offset,
         },
-        mode
+        mode,
       });
       return {
         games: response.data,
         fetchedOn: new Date(),
-        mode
+        mode,
       };
-    } catch(err) {
-      console.error('error fetching games for', this.gamerTag, 'in', mode, 'count',count,'offset',offset)
-      console.error(err)
-      if (err.message === StatsApiErrors.PlayerNotFound) throw new Error(`No player found with tag: ${this.gamerTag}`)
-      throw new Error('Sorry something went wrong!')
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("error fetching games for", this.gamerTag, "in", mode, "count", count, "offset", offset);
+      // eslint-disable-next-line no-console
+      console.error(err);
+      if (err.message === StatsApiErrors.PlayerNotFound) throw new Error(`No player found with tag: ${this.gamerTag}`);
+      throw new Error("Sorry something went wrong!");
     }
   }
 }

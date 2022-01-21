@@ -5,7 +5,8 @@
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:import/typescript",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
   ],
   "plugins": [
     "jest",
@@ -14,35 +15,50 @@
   "root": true,
   "globals": {},
   "rules": {
-    "import/no-unresolved": [2, {"commonjs": true, "amd": true}],
+    "max-classes-per-file": 0,
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "import/no-unresolved": [
+      2,
+      {
+        "commonjs": true,
+        "amd": true
+      }
+    ],
     "import/prefer-default-export": "off",
-    "max-len": ["error", {
-      "code":  150,
-      "ignoreComments":  true,
-      "ignoreTrailingComments":  true,
-      "ignoreUrls": true,
-      "ignoreStrings": true,
-      "ignoreTemplateLiterals": true
-    }]
+    "max-len": [
+      "error",
+      {
+        "code": 150,
+        "ignoreComments": true,
+        "ignoreTrailingComments": true,
+        "ignoreUrls": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "spaced-comment": [
+      "error",
+      "always",
+      {
+        "markers": [
+          "global"
+        ]
+      }
+    ]
   },
   "parser": "@typescript-eslint/parser",
   "env": {},
   "overrides": [],
   "settings": {
-    "import/resolver": {
-      "alias": {
-        "map": [
-          ["@src", "./src"],
-          ["@tests", "./tests"],
-          ["@queries", "./queries"],
-          ["@utils", "./utils"],
-          ["@models", "./models"]
-        ],
-        "extensions": [
-          ".ts",
-          ".js"
-        ]
-      }
-    }
+    "import/resolver": "webpack"
   }
 }

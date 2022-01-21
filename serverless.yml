@@ -17,7 +17,7 @@ custom:
     defaultInherit: true # Each function will inherit the service level roles too.
   globalTables:
     regions: # list of regions in which you want to set up global tables
-      - us-east-1 
+      - us-east-1
     createStack: true
   prune:
     automatic: true
@@ -35,7 +35,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   stage: ${opt:stage, 'local'}
   region: ${opt:region, 'us-east-1'}
   timeout: 29 # optional, in seconds, default is 6
