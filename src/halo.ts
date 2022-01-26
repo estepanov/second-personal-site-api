@@ -34,7 +34,7 @@ export const recentMatches: APIGatewayProxyHandler = async () => {
     if (cachedResults) return MessageUtil.success(cachedResults);
 
     const service = new HaloStats(process.env.GAMER_TAG);
-    const stats = await service.fetchGames(MatchMode.MATCHMADE, 15, 0);
+    const stats = await service.fetchGames(MatchMode.MATCHMADE, 25, 0);
     if (stats) {
       await cache.setSeconds(stats, HALO_STATS_CACHE_SECONDS);
     }
