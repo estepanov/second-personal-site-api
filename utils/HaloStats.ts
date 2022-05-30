@@ -22,7 +22,7 @@ export enum StatsApiErrors {
 }
 
 export class HaloStats {
-  api = lib.halo.infinite["@0.3.6"];
+  api = lib.halo.infinite["@1.4.0"];
 
   gamerTag: string | null = null;
 
@@ -32,7 +32,7 @@ export class HaloStats {
 
   async fetchMultiplayerOverview(type = Experience.ALL): Promise<unknown> {
     try {
-      const response = await this.api.stats["service-record"].multiplayer({
+      const response = await this.api.stats.players["service-record"].multiplayer.matchmade.all({
         gamertag: this.gamerTag,
         experience: type,
       });
@@ -53,7 +53,7 @@ export class HaloStats {
 
   async fetchGames(mode: MatchMode, count: number, offset: number): Promise<unknown> {
     try {
-      const response = await this.api.stats.matches.list({
+      const response = await this.api.stats.players.matches({
         gamertag: this.gamerTag,
         limit: {
           count,
